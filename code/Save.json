@@ -1,0 +1,23 @@
+{
+    "jsonrpc": "2.00000000",
+    "method": "textDocument/publishDiagnostics",
+    "params": {
+        "diagnostics": [
+            {
+                "code": "undeclared_var_use",
+                "message": "Use of undeclared identifier 'pls'",
+                "range": {
+                    "end": {
+                        "character": "5",
+                        "line": "1"
+                    },
+                    "start": {
+                        "character": "2",
+                        "line": "1"
+                    }
+                },
+                "relatedInformation": ""
+            }
+        ]
+    }
+}

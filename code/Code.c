@@ -2,20 +2,17 @@
 #include "/home/codeleaded/System/Static/Library/Scene.h"
 #include "/home/codeleaded/System/Static/Library/LSP.h"
 #include "/home/codeleaded/System/Static/Library/WindowEngine.h"
-#include "/home/codeleaded/System/Static/Library/Random.h"
-
+!
 const char* clangd_args[] = {"clangd","--background-index",NULL};
 const char* project = "/home/codeleaded/Hecke/C/Gui_IDE_Tiled_LSP";
 const char* source = "/home/codeleaded/Hecke/C/Gui_IDE_Tiled_LSP/code/Code.c";
 const char* uri = "file:///home/codeleaded/Hecke/C/Gui_IDE_Tiled_LSP/code/Code.c";
 const char* root_uri = "file:///home/codeleaded/Hecke/C/Gui_IDE_Tiled_LSP";
-
 LSP_Language clangd;
 LSP lsp;
 Scene scene;
 CStr editor_content = NULL;
-int version = 2;
-
+int version = 0;
 static char* Read_File(const char* path){
     FILE* file = fopen(path,"rb");
     if(!file) return NULL;
@@ -99,18 +96,17 @@ static void Drain_Notifications(LSP* lsp,unsigned int milliseconds){
 void Diagnostics_Update(Editor* editor){
 	CStr content = String_CStr(&editor->In.Buffer);
 	
-	//Files_Write((char*)source,content,CStr_Size(content));
+	Files_Write((char*)source,content,CStr_Size(content));
     if(!LSP_DidChange(&lsp,uri,version++,content)){
         fprintf(stderr,"!!!!!!!! Could not send didChange.\n");
     }
 
-	if(editor->In.changed){
+	if(editor_content && !CStr_Cmp(editor_content,content)){
 		Editor_Info_Clear(editor);
-		editor->In.changed = 0;
 	}
 	
 	LSP_Package diagnostics = LSP_Package_New();
-    while(LSP_Wait_Notification(&lsp,"textDocument/publishDiagnostics",&diagnostics,10U)){
+    while(LSP_Wait_Notification(&lsp,"textDocument/publishDiagnostics",&diagnostics,100U)){
         Print_Message("DIAGNOSTICS",&diagnostics);
 		
 		Json yl = Json_By(diagnostics.data);
@@ -287,26 +283,26 @@ void Setup(AlxWindow* w){
 		TilingManager_New(
 			(void*)&scene,
 			Component1_React,
-			Rect_New((Vec2){ 0.0125f,0.0125f },(Vec2){ 0.9725f,0.9725f }),
+			Rect_New((Vec2){ 0.1f,0.1f },(Vec2){ 0.8f,0.8f }),
 			GRAY,
 			GREEN
 		) 
 	},sizeof(TilingManager));
 }
 void Update(AlxWindow* w){
+
 	if(w->Strokes[ALX_MOUSE_L].PRESSED && w->Strokes[ALX_KEY_CTRL].DOWN){
 		TilingManager* const b = (TilingManager*)scene.childs.First->Memory;
 		
 		char* source_text = Read_File(source);
 
-		Editor new_c = Editor_New(
+		Editor new_c = Editor_NewStd(
 			&b->renderable,
 			source_text,
 			Component3_React,
-			AlxFont_New(ALXFONT_HIGH),
-			(Vec2){ 16.0f,32.0f },
+			(Vec2){ 32.0f,32.0f },
 			Rect_New(Vec2_Div(Vec2_Sub(GetMouse(),b->renderable.rect.p),b->renderable.rect.d),(Vec2){ 0.25f,0.25f }),
-			10000U,
+			100U,
 			DARK_GRAY,
 			LIGHT_GRAY
 		);
