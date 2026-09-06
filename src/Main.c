@@ -1,4 +1,4 @@
-#define C_SYNTAX "/home/codeleaded/System/SyntaxFiles/C_Syntax.alxon"
+#define C_SYNTAX "/home/codeleaded/System/SyntaxFiles/C_Syntax.json"
 #include "/home/codeleaded/System/Static/Library/Scene.h"
 #include "/home/codeleaded/System/Static/Library/LSP.h"
 #include "/home/codeleaded/System/Static/Library/WindowEngine.h"
